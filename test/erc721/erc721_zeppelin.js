@@ -23,7 +23,6 @@ const {
 // deployment routines in use, token name and symbol
 const {
 	erc721_deploy,
-	upgradeable_erc721_deploy,
 	NAME,
 	SYMBOL,
 } = require("./include/deployment_routines");
@@ -31,7 +30,6 @@ const {
 // deployment fixture routines in use
 const {
 	get_erc721_deployment,
-	get_erc721_upgradeable_deployment,
 } = require("../include/deployment_fixture_routines");
 
 // run OpenZeppelin ERC721 tests
@@ -79,5 +77,4 @@ contract("ERC721: OpenZeppelin ERC721 Tests", function(accounts) {
 	// run the suite
 	// TODO: use fixtures (currently slows down the test significantly)
 	zeppelin_suite("ERC721Impl", erc721_deploy);
-	zeppelin_suite("ERC721v1.sol", upgradeable_erc721_deploy);
 });

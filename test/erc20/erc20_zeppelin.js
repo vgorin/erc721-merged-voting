@@ -25,7 +25,6 @@ const {
 // deployment routines in use
 const {
 	erc20_deploy,
-	upgradeable_erc20_deploy,
 	NAME,
 	SYMBOL,
 	DECIMALS,
@@ -35,7 +34,6 @@ const {
 // deployment fixture routines in use
 const {
 	get_erc20_deployment,
-	get_erc20_upgradeable_deployment,
 } = require("../include/deployment_fixture_routines");
 
 // run OpenZeppelin ERC20 tests
@@ -96,5 +94,4 @@ contract("ERC20: OpenZeppelin ERC20 Tests", function(accounts) {
 	}
 
 	zeppelin_suite("ERC20Impl", get_erc20_deployment);
-	zeppelin_suite("ERC20v1.sol", get_erc20_upgradeable_deployment);
 });

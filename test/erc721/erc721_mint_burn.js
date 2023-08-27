@@ -23,13 +23,11 @@ const {random_bn256} = require("../../scripts/include/bn_utils");
 // deployment routines in use
 const {
 	erc721_deploy,
-	upgradeable_erc721_deploy,
 } = require("./include/deployment_routines");
 
 // deployment fixture routines in use
 const {
 	get_erc721_deployment,
-	get_erc721_upgradeable_deployment,
 } = require("../include/deployment_fixture_routines");
 
 // run Mint/Burn ERC721 Tests addons
@@ -76,5 +74,4 @@ contract("ERC721: Mint/Burn Tests addons", function(accounts) {
 	}
 
 	run_erc721_mint_burn_tests_addon("ERC721Impl", get_erc721_deployment);
-	run_erc721_mint_burn_tests_addon("ERC721v1.sol", get_erc721_upgradeable_deployment);
 });

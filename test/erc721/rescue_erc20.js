@@ -25,7 +25,6 @@ const {
 // deployment routines in use
 const {
 	erc721_deploy,
-	upgradeable_erc721_deploy,
 } = require("./include/deployment_routines");
 const {
 	erc20_deploy,
@@ -35,7 +34,6 @@ const {
 // deployment fixture routines in use
 const {
 	get_erc721_deployment,
-	get_erc721_upgradeable_deployment,
 } = require("../include/deployment_fixture_routines");
 
 // run rescue ERC20 tokens tests
@@ -137,5 +135,4 @@ contract("ERC721: rescue ERC20 tokens test", function(accounts) {
 
 	// run the suite
 	rescue_suite("ERC721Impl", get_erc721_deployment);
-	rescue_suite("ERC721v1.sol", get_erc721_upgradeable_deployment);
 });

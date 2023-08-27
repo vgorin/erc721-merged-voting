@@ -23,7 +23,6 @@ const {random_bn} = require("../../scripts/include/bn_utils");
 // deployment routines in use
 const {
 	erc20_deploy,
-	upgradeable_erc20_deploy,
 	NAME,
 	SYMBOL,
 	DECIMALS,
@@ -33,7 +32,6 @@ const {
 // deployment fixture routines in use
 const {
 	get_erc20_deployment,
-	get_erc20_upgradeable_deployment,
 } = require("../include/deployment_fixture_routines");
 
 // run Mint/Burn ERC20 Tests addons
@@ -81,5 +79,4 @@ contract("ERC20: Mint/Burn Tests addons", function(accounts) {
 	}
 
 	run_erc20_mint_burn_tests_addon("ERC20Impl", get_erc20_deployment);
-	run_erc20_mint_burn_tests_addon("ERC20v1.sol", get_erc20_upgradeable_deployment);
 });

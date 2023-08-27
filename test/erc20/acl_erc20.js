@@ -34,14 +34,12 @@ const {
 // deployment routines in use
 const {
 	erc20_deploy_restricted,
-	upgradeable_erc20_deploy_restricted,
 	S0,
 } = require("./include/deployment_routines");
 
 // deployment fixture routines in use
 const {
 	get_erc20_deployment,
-	get_erc20_upgradeable_deployment,
 } = require("../include/deployment_fixture_routines");
 
 // run AccessControl (ACL) tests
@@ -181,5 +179,4 @@ contract("ERC20: AccessControl (ACL) tests", function(accounts) {
 
 	// run the suite
 	acl_suite("ERC20Impl", get_erc20_deployment);
-	acl_suite("ERC20v1.sol", get_erc20_upgradeable_deployment);
 });
