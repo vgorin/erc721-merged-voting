@@ -1,4 +1,4 @@
-// upgrade: npx hardhat deploy --network goerli --tags upgrade-TierDBv1
+// upgrade: npx hardhat deploy --network goerli --tags upgrade-VotingPowerV1
 // verify: npx hardhat etherscan-verify --network goerli
 
 // script is built for hardhat-deploy plugin:
@@ -34,7 +34,7 @@ module.exports = async function({deployments, getChainId, getNamedAccounts, getU
 	// TierDB ERC1967Proxy
 	{
 		// get deployment details
-		const v1_deployment = await deployments.get("TierDBv1");
+		const v1_deployment = await deployments.get("VotingPowerV1");
 		const v1_contract = new web3.eth.Contract(v1_deployment.abi, v1_deployment.address);
 
 		// print v1.1 deployment details
@@ -68,5 +68,5 @@ module.exports = async function({deployments, getChainId, getNamedAccounts, getU
 // Then if another deploy script has such tag as a dependency, then when the latter deploy script has a specific tag
 // and that tag is requested, the dependency will be executed first.
 // https://www.npmjs.com/package/hardhat-deploy#deploy-scripts-tags-and-dependencies
-module.exports.tags = ["upgrade-TierDBv1", "upgrade"];
-module.exports.dependencies = ["TierDBv1", "TierDB_Proxy"];
+module.exports.tags = ["upgrade-VotingPowerV1", "upgrade"];
+module.exports.dependencies = ["VotingPowerV1", "VotingPower_Proxy"];

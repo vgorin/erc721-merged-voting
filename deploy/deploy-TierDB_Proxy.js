@@ -33,19 +33,15 @@ module.exports = async function({deployments, getChainId, getNamedAccounts, getU
 
 	// TierDB ERC1967Proxy
 	{
-		// get ERC721 implementation deployment details
-		const erc721_impl_deployment = await deployments.get("AwesomeERC721");
-		const erc721_impl_contract = new web3.eth.Contract(erc721_impl_deployment.abi, erc721_impl_deployment.address);
-
-		// print ERC721 impl deployment details
-		await print_contract_details(A0, erc721_impl_deployment.abi, erc721_impl_deployment.address);
+		// get NFT contract address
+		const {address: nft_address} = await deployments.get("AwesomeERC721");
 
 		// get the deployment details
 		const v1_deployment = await deployments.get("TierDBv1");
 		const v1_contract = new web3.eth.Contract(v1_deployment.abi, v1_deployment.address);
 
 		// prepare proxy initialization call bytes
-		const proxy_init_data = v1_contract.methods.postConstruct(erc721_impl_deployment.address).encodeABI();
+		const proxy_init_data = v1_contract.methods.postConstruct(nft_address).encodeABI();
 
 		// deploy ERC1967 proxy
 		await deployments.deploy("TierDB_Proxy", {

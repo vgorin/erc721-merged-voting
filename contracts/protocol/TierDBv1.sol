@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+import "../interfaces/TierAware.sol";
 import "../utils/UpgradeableAccessControl.sol";
 
 /**
@@ -33,13 +34,13 @@ interface ERC721Existable {
  *
  *      For example: voting_power(tier) = 2 ^ (tier - 1)
  *
- * @notice Version 1
+ * @dev Version 1
  *
  * @author Basil Gorin
  */
 // TODO: implement tests for the contract
 // TODO: implement the Merger contract which would have the permission to increase NFT tier
-contract TierDBv1 is UpgradeableAccessControl {
+contract TierDBv1 is TierAware, UpgradeableAccessControl {
 	/**
 	 * @dev maps token ID => tier level minus one
 	 *
@@ -85,6 +86,8 @@ contract TierDBv1 is UpgradeableAccessControl {
 	/**
 	 * @dev "Constructor replacement" for upgradeable, must be executed immediately after deployment
 	 *      see https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializers
+	 *
+	 * @param _nftContract ERC721 contract Tier DB is bound to
 	 */
 	function postConstruct(address _nftContract) public initializer {
 		// verify the address is set
@@ -98,12 +101,17 @@ contract TierDBv1 is UpgradeableAccessControl {
 	}
 
 	/**
+	 * @inheritdoc TierAware
+	 *
 	 * @notice Gets the tier level for an NFT with the given ID
 	 *
 	 * @param tokenId NFT ID to query tier for
 	 * @return zero if NFT doesn't exist, its tier otherwise
 	 */
-	function getTier(uint256 tokenId) public view returns(uint8) {
+	function getTier(address nftAddress, uint256 tokenId) public view override returns(uint8) {
+		// only nftContract is supported by current implementation
+		require(nftAddress == address(nftContract), "unknown NFT contract");
+
 		// check if NFT with given ID exists, return zero if not, return value from the mapping if yes
 		return nftContract.exists(tokenId)? tiers[tokenId] + 1: 0;
 	}
@@ -131,27 +139,5 @@ contract TierDBv1 is UpgradeableAccessControl {
 
 		// emit an event
 		emit TierIncreased(address(nftContract), tokenId, tiers[tokenId]);
-	}
-
-	/**
-	 * @notice Calculates the default voting power according to the default formula
-	 *
-	 *      voting_power(tier) = 2 ^ (tier - 1)
-	 *
-	 *      voting power is zero for non-existent tokens
-	 *      voting power is in range [1, 64] for tokens in existence
-	 *
-	 * @notice Client applications are free to override this and use any formula
-	 *
-	 * @param tokenId NFT to calculate voting power for
-	 * @return zero if NFT doesn't exist, its voting power otherwise
-	 */
-	function defaultVotingPower(uint256 tokenId) public view returns(uint16) {
-		// get NFT's tier level as uint16 to be save from int overflows
-		// if `MAXIMUM_TIER` is accidentally increased without modifying this function
-		uint16 tier = getTier(tokenId);
-
-		// calculate the voting power, keeping in mind that tier zero means non-existent token
-		return tier > 0? uint16(2) ** (tier - 1): 0;
 	}
 }

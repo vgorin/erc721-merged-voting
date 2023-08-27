@@ -1,4 +1,4 @@
-// upgrade: npx hardhat deploy --network goerli --tags upgrade-TierDBv1
+// deploy: npx hardhat deploy --network goerli --tags VotingPowerV1
 // verify: npx hardhat etherscan-verify --network goerli
 
 // script is built for hardhat-deploy plugin:
@@ -31,35 +31,28 @@ module.exports = async function({deployments, getChainId, getNamedAccounts, getU
 	console.log("network %o %o", chainId, network.name);
 	console.log("accounts: %o, service account %o, nonce: %o, balance: %o ETH", accounts.length, A0, nonce, print_amt(balance));
 
-	// TierDB ERC1967Proxy
+	// VotingPowerV1
 	{
+		// deploy if required
+		await deployments.deploy("VotingPowerV1", {
+			// address (or private key) that will perform the transaction.
+			// you can use `getNamedAccounts` to retrieve the address you want by name.
+			from: A0,
+			contract: "VotingPowerV1",
+			// the list of argument for the constructor (or the upgrade function in case of proxy)
+			// args: [nft_contract_address],
+			// if set it to true, will not attempt to deploy even if the contract deployed under the same name is different
+			skipIfAlreadyDeployed: true,
+			// if true, it will log the result of the deployment (tx hash, address and gas used)
+			log: true,
+		});
+
 		// get deployment details
-		const v1_deployment = await deployments.get("TierDBv1");
-		const v1_contract = new web3.eth.Contract(v1_deployment.abi, v1_deployment.address);
+		const deployment = await deployments.get("VotingPowerV1");
+		const contract = new web3.eth.Contract(deployment.abi, deployment.address);
 
-		// print v1.1 deployment details
-		await print_contract_details(A0, v1_deployment.abi, v1_deployment.address);
-
-		// get proxy deployment details
-		const proxy_deployment = await deployments.get("TierDB_Proxy");
-		const proxy_contract = new web3.eth.Contract(v1_deployment.abi, proxy_deployment.address);
-
-		// print proxy deployment details
-		const {implementation_address} = await print_contract_details(A0, v1_deployment.abi, proxy_deployment.address);
-
-		// check if upgrade is not yet done
-		if(implementation_address !== web3.utils.toChecksumAddress(v1_deployment.address)) {
-			// prepare the upgradeTo call bytes
-			const proxy_upgrade_data = v1_contract.methods.upgradeTo(v1_deployment.address).encodeABI();
-
-			// update the implementation address in the proxy
-			const receipt = await deployments.rawTx({
-				from: A0,
-				to: proxy_deployment.address,
-				data: proxy_upgrade_data, // upgradeTo(v1_deployment.address)
-			});
-			console.log("TierDB_Proxy.upgradeTo(%o): %o", v1_deployment.address, receipt.transactionHash);
-		}
+		// print deployment details
+		await print_contract_details(A0, deployment.abi, deployment.address);
 	}
 };
 
@@ -68,5 +61,4 @@ module.exports = async function({deployments, getChainId, getNamedAccounts, getU
 // Then if another deploy script has such tag as a dependency, then when the latter deploy script has a specific tag
 // and that tag is requested, the dependency will be executed first.
 // https://www.npmjs.com/package/hardhat-deploy#deploy-scripts-tags-and-dependencies
-module.exports.tags = ["upgrade-TierDBv1", "upgrade"];
-module.exports.dependencies = ["TierDBv1", "TierDB_Proxy"];
+module.exports.tags = ["VotingPowerV1", "deploy"];

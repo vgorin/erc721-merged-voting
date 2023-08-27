@@ -1,4 +1,4 @@
-// upgrade: npx hardhat deploy --network goerli --tags upgrade-TierDBv1
+// deploy: npx hardhat deploy --network goerli --tags VotingPower_Proxy
 // verify: npx hardhat etherscan-verify --network goerli
 
 // script is built for hardhat-deploy plugin:
@@ -31,35 +31,41 @@ module.exports = async function({deployments, getChainId, getNamedAccounts, getU
 	console.log("network %o %o", chainId, network.name);
 	console.log("accounts: %o, service account %o, nonce: %o, balance: %o ETH", accounts.length, A0, nonce, print_amt(balance));
 
-	// TierDB ERC1967Proxy
+	// VotingPower ERC1967Proxy
 	{
-		// get deployment details
-		const v1_deployment = await deployments.get("TierDBv1");
+		// get NFT contract address
+		const {address: nft_address} = await deployments.get("AwesomeERC721");
+
+		// get TierDB address
+		const {address: tier_db_address} = await deployments.get("TierDB_Proxy");
+
+		// get the deployment details
+		const v1_deployment = await deployments.get("VotingPowerV1");
 		const v1_contract = new web3.eth.Contract(v1_deployment.abi, v1_deployment.address);
 
-		// print v1.1 deployment details
-		await print_contract_details(A0, v1_deployment.abi, v1_deployment.address);
+		// prepare proxy initialization call bytes
+		const proxy_init_data = v1_contract.methods.postConstruct(nft_address, tier_db_address).encodeABI();
+
+		// deploy ERC1967 proxy
+		await deployments.deploy("VotingPower_Proxy", {
+			// address (or private key) that will perform the transaction.
+			// you can use `getNamedAccounts` to retrieve the address you want by name.
+			from: A0,
+			contract: "ERC1967Proxy",
+			// the list of argument for the constructor (or the upgrade function in case of proxy)
+			args: [v1_deployment.address, proxy_init_data],
+			// if set it to true, will not attempt to deploy even if the contract deployed under the same name is different
+			skipIfAlreadyDeployed: true,
+			// if true, it will log the result of the deployment (tx hash, address and gas used)
+			log: true,
+		});
 
 		// get proxy deployment details
-		const proxy_deployment = await deployments.get("TierDB_Proxy");
+		const proxy_deployment = await deployments.get("VotingPower_Proxy");
 		const proxy_contract = new web3.eth.Contract(v1_deployment.abi, proxy_deployment.address);
 
 		// print proxy deployment details
-		const {implementation_address} = await print_contract_details(A0, v1_deployment.abi, proxy_deployment.address);
-
-		// check if upgrade is not yet done
-		if(implementation_address !== web3.utils.toChecksumAddress(v1_deployment.address)) {
-			// prepare the upgradeTo call bytes
-			const proxy_upgrade_data = v1_contract.methods.upgradeTo(v1_deployment.address).encodeABI();
-
-			// update the implementation address in the proxy
-			const receipt = await deployments.rawTx({
-				from: A0,
-				to: proxy_deployment.address,
-				data: proxy_upgrade_data, // upgradeTo(v1_deployment.address)
-			});
-			console.log("TierDB_Proxy.upgradeTo(%o): %o", v1_deployment.address, receipt.transactionHash);
-		}
+		await print_contract_details(A0, v1_deployment.abi, proxy_deployment.address);
 	}
 };
 
@@ -68,5 +74,5 @@ module.exports = async function({deployments, getChainId, getNamedAccounts, getU
 // Then if another deploy script has such tag as a dependency, then when the latter deploy script has a specific tag
 // and that tag is requested, the dependency will be executed first.
 // https://www.npmjs.com/package/hardhat-deploy#deploy-scripts-tags-and-dependencies
-module.exports.tags = ["upgrade-TierDBv1", "upgrade"];
-module.exports.dependencies = ["TierDBv1", "TierDB_Proxy"];
+module.exports.tags = ["VotingPower_Proxy", "deploy"];
+module.exports.dependencies = ["VotingPowerV1", "AwesomeERC721", "TierDB_Proxy"];
