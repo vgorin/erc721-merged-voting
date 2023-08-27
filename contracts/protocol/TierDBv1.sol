@@ -152,6 +152,6 @@ contract TierDBv1 is UpgradeableAccessControl {
 		uint16 tier = getTier(tokenId);
 
 		// calculate the voting power, keeping in mind that tier zero means non-existent token
-		return tier > 0? (tier - 1) ** 2: 0;
+		return tier > 0? uint16(2) ** (tier - 1): 0;
 	}
 }
