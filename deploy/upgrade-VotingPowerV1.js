@@ -41,7 +41,7 @@ module.exports = async function({deployments, getChainId, getNamedAccounts, getU
 		await print_contract_details(A0, v1_deployment.abi, v1_deployment.address);
 
 		// get proxy deployment details
-		const proxy_deployment = await deployments.get("TierDB_Proxy");
+		const proxy_deployment = await deployments.get("VotingPower_Proxy");
 		const proxy_contract = new web3.eth.Contract(v1_deployment.abi, proxy_deployment.address);
 
 		// print proxy deployment details
@@ -58,7 +58,7 @@ module.exports = async function({deployments, getChainId, getNamedAccounts, getU
 				to: proxy_deployment.address,
 				data: proxy_upgrade_data, // upgradeTo(v1_deployment.address)
 			});
-			console.log("TierDB_Proxy.upgradeTo(%o): %o", v1_deployment.address, receipt.transactionHash);
+			console.log("VotingPower_Proxy.upgradeTo(%o): %o", v1_deployment.address, receipt.transactionHash);
 		}
 	}
 };
