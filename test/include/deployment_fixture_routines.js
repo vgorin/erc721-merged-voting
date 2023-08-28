@@ -1,6 +1,6 @@
 // we use hardhat deployment to work with fixtures
 // see https://github.com/wighawag/hardhat-deploy#creating-fixtures
-const {deployments} = require('hardhat');
+const {deployments} = require("hardhat");
 
 /**
  * Gets ERC20 token with all the features enabled
@@ -10,7 +10,7 @@ const {deployments} = require('hardhat');
 async function get_erc20_deployment() {
 	// make sure fixtures were deployed, this can be also done via --deploy-fixture test flag
 	// see https://github.com/wighawag/hardhat-deploy#creating-fixtures
-	await deployments.fixture();
+	await deployments.fixture(["deploy", "setup"]);
 
 	// get deployed contract address
 	const {address} = await deployments.get("AwesomeERC20");
@@ -28,7 +28,7 @@ async function get_erc20_deployment() {
 async function get_erc721_deployment() {
 	// make sure fixtures were deployed, this can be also done via --deploy-fixture test flag
 	// see https://github.com/wighawag/hardhat-deploy#creating-fixtures
-	await deployments.fixture();
+	await deployments.fixture(["deploy", "setup"]);
 
 	// get deployed contract address
 	const {address} = await deployments.get("AwesomeERC721");

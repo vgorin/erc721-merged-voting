@@ -66,5 +66,5 @@ module.exports = async function({deployments, getChainId, getNamedAccounts, getU
 // Then if another deploy script has such tag as a dependency, then when the latter deploy script has a specific tag
 // and that tag is requested, the dependency will be executed first.
 // https://www.npmjs.com/package/hardhat-deploy#deploy-scripts-tags-and-dependencies
-module.exports.tags = ["setup-AwesomeERC20"];
+module.exports.tags = ["setup-AwesomeERC20", "setup"];
 module.exports.dependencies = ["AwesomeERC20"];
